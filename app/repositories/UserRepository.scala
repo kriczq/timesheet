@@ -1,4 +1,4 @@
-package models
+package repositories
 
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -11,14 +11,18 @@ case class User(id: Long,
                 name: String,
                 password: String)
 
+trait UserDao {
+  def add(user: User): Future[User]
+  def all(): Future[Seq[User]]
+}
 
-class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
+class UserDaoImpl @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
                        (implicit executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
 
   class UserTable(tag: Tag) extends Table[User](tag, "user") {
-    def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
+    def id = column[Long]("id", O.PrimaryKey)
     def email = column[String]("email")
     def name = column[String]("name")
     def password = column[String]("password")
@@ -28,7 +32,7 @@ class UserDao @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   private val users = TableQuery[UserTable]
 
-  def add(user: User): Future[Int] = db.run(users += user)
+  def add(user: User): Future[User] = db.run(users += user).map(_ => user)
 
   def all(): Future[Seq[User]] = db.run(users.result)
 }
