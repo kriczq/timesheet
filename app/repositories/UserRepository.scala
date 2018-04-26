@@ -11,18 +11,13 @@ case class User(id: Long,
                 name: String,
                 password: String)
 
-trait UserDao {
-  def add(user: User): Future[User]
-  def all(): Future[Seq[User]]
-}
-
-class UserDaoImpl @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
-                       (implicit executionContext: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
+class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext)
+  extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
 
   class UserTable(tag: Tag) extends Table[User](tag, "user") {
-    def id = column[Long]("id", O.PrimaryKey)
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def email = column[String]("email")
     def name = column[String]("name")
     def password = column[String]("password")
@@ -32,7 +27,19 @@ class UserDaoImpl @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
   private val users = TableQuery[UserTable]
 
-  def add(user: User): Future[User] = db.run(users += user).map(_ => user)
+  def add(user: User): Future[User] = {
+    val insertQuery = users returning users.map(_.id) into ((item, id) => item.copy(id = id))
+    val action = insertQuery += user
+    db.run(action)
+  }
 
-  def all(): Future[Seq[User]] = db.run(users.result)
+  def all(): Future[Seq[User]] = {
+    db.run(users.result)
+  }
+
+  def find(id: Long): Future[Option[User]] = {
+    val action = users.filter(_.id === id).result.headOption
+    db.run(action)
+  }
+
 }

@@ -2,7 +2,7 @@
 
 # --- !Ups
 create table user (
-  `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `email` TEXT NOT NULL,
   `name` TEXT NOT NULL,
   `password` TEXT NOT NULL

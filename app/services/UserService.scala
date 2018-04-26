@@ -1,9 +1,9 @@
-package handlers
+package services
 
 import controllers.UserFormInput
 import javax.inject.Inject
-import models.{User, UserDao}
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{Json, Writes}
+import repositories.{User, UserRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -14,16 +14,24 @@ object UserResource {
   implicit val userWrites: Writes[UserResource] = Json.writes[UserResource]
 }
 
-class UserHandler @Inject()(userDao: UserDao)(implicit ec: ExecutionContext) {
+class UserService @Inject()(userRepo: UserRepository)(implicit ec: ExecutionContext) {
 
   def create(userFormInput: UserFormInput): Future[UserResource] = {
     val user = User(0, userFormInput.email, userFormInput.name, userFormInput.password)
-    userDao.add(user).map { u => createUserResource(u) }
+    userRepo.add(user).map { u => createUserResource(u) }
   }
 
   def list(): Future[Seq[UserResource]] = {
-    userDao.all().map {
+    userRepo.all().map {
       userList => userList.map(u => createUserResource(u))
+    }
+  }
+
+  def find(id: Long): Future[Option[UserResource]] = {
+    userRepo.find(id).map { maybeUser =>
+      maybeUser.map { user =>
+        createUserResource(user)
+      }
     }
   }
 

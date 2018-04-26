@@ -1,21 +1,56 @@
 package controllers
 
 import javax.inject.Inject
-import models.{User, UserDao}
-import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
+import play.api.data._
+import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
+import play.api.mvc._
+import services.UserService
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class UserController @Inject()(userDao: UserDao,
-                                cc: ControllerComponents)(implicit ec: ExecutionContext) extends AbstractController(cc){
+case class UserFormInput(email: String, name: String, password: String)
 
+class UserController @Inject()(userHandler: UserService, cc: ControllerComponents)
+                              (implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
-  def insert = Action.async { implicit request: Request[AnyContent] =>
-    val user = User("dawid", "asdasd", "haslo")
-    userDao.add(user).map(u => Ok(u.toString))
+  val userForm: Form[UserFormInput] = {
+    import play.api.data.Forms._
+
+    Form(
+      mapping(
+        "email" -> email,
+        "name" -> text,
+        "password" -> text
+      )(UserFormInput.apply)(UserFormInput.unapply)
+    )
   }
 
-  def list = Action.async { implicit request: Request[AnyContent] =>
-    userDao.all().map(u => Ok(u.toString()))
+  def insert() = Action.async { implicit request =>
+    processInserting()
+  }
+
+  def list() = Action.async { implicit request =>
+    userHandler.list().map(list => Ok(Json.toJson(list)))
+  }
+
+  def get(id: Long) = Action.async { implicit request =>
+    userHandler.find(id).map {
+      case None => NotFound
+      case Some(user) => Ok(Json.toJson(user))
+    }
+  }
+
+  private def processInserting[A]()(implicit request: Request[A]): Future[Result] = {
+    def failure(badForm: Form[UserFormInput]) = {
+      Future.successful(BadRequest(badForm.errorsAsJson))
+    }
+
+    def success(input: UserFormInput) = {
+      userHandler.create(input).map(output =>
+        Created(Json.toJson(output)))
+    }
+
+    userForm.bindFromRequest().fold(failure, success)
   }
 }
