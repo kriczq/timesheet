@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class UserFormInput(email: String, name: String, password: String)
 
-class UserController @Inject()(userHandler: UserService, cc: ControllerComponents)
+class UserController @Inject()(userService: UserService, cc: ControllerComponents)
                               (implicit ec: ExecutionContext) extends AbstractController(cc) with I18nSupport {
 
   val userForm: Form[UserFormInput] = {
@@ -31,11 +31,11 @@ class UserController @Inject()(userHandler: UserService, cc: ControllerComponent
   }
 
   def list() = Action.async { implicit request =>
-    userHandler.list().map(list => Ok(Json.toJson(list)))
+    userService.list().map(list => Ok(Json.toJson(list)))
   }
 
   def get(id: Long) = Action.async { implicit request =>
-    userHandler.find(id).map {
+    userService.find(id).map {
       case None => NotFound
       case Some(user) => Ok(Json.toJson(user))
     }
@@ -47,7 +47,7 @@ class UserController @Inject()(userHandler: UserService, cc: ControllerComponent
     }
 
     def success(input: UserFormInput) = {
-      userHandler.create(input).map(output =>
+      userService.create(input).map(output =>
         Created(Json.toJson(output)))
     }
 

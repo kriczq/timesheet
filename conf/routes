@@ -4,9 +4,11 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.UserController.list
-POST    /users                      controllers.UserController.insert
-GET     /users                      controllers.UserController.list
-GET     /users/:id                  controllers.UserController.get(id: Long)
+GET         /                    controllers.UserController.list
+POST        /users               controllers.UserController.insert
+GET         /users               controllers.UserController.list
+GET         /users/:id           controllers.UserController.get(id: Long)
+POST        /auth                controllers.AuthController.login()
+GET         /auth                controllers.AuthController.signIn()
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)

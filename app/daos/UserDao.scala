@@ -22,6 +22,8 @@ trait UserDao {
   def find(id: Long): Future[Option[User]]
 
   def delete(id: Long): Future[Unit]
+
+  def find(email: String): Future[Option[User]]
 }
 
 class UserDaoImpl @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext)
@@ -61,5 +63,10 @@ class UserDaoImpl @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
   def delete(id: Long): Future[Unit] = {
     val action = users.filter(_.id === id).delete
     db.run(action).map(_ => ())
+  }
+
+  def find(email: String): Future[Option[User]] = {
+    val action = users.filter(_.email === email).result.headOption
+    db.run(action)
   }
 }

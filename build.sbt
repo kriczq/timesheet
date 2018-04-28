@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
   specs2 % Test,
   "mysql" % "mysql-connector-java" % "5.1.37",
   "com.typesafe.play" %% "play-slick" % "3.0.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0"
+  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0",
+  "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5"
 )
 
 
