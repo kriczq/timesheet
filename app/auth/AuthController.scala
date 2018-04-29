@@ -1,14 +1,12 @@
-package controllers
+package auth
 
 import java.util.Calendar
 
-import auth.{JwtAuthentication, JwtService, ErrorProvider}
+import auth.ErrorMessageProvider._
 import javax.inject.Inject
 import play.api.data.Form
 import play.api.libs.json._
 import play.api.mvc.{AbstractController, ControllerComponents, Request, Result}
-import services.AuthService
-import ErrorProvider._
 
 import scala.concurrent.{ExecutionContext, Future}
 

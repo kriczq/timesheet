@@ -5,6 +5,7 @@ import com.google.inject.ImplementedBy
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
+import auth.ErrorMessageProvider._
 
 import scala.concurrent.{ExecutionContext, Future}
 

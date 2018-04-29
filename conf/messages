@@ -1,2 +1,5 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
-
+api.error.invalidCredentials=Invalid credentials
+api.error.invalidToken=Invalid token
+api.error.userNotFound=User not found
+api.error.token.notFound=Auth Token header not found

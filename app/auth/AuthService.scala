@@ -1,6 +1,5 @@
-package services
+package auth
 
-import controllers.UserCredentials
 import daos.UserDao
 import javax.inject.Inject
 

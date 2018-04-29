@@ -3,15 +3,15 @@ package services
 import controllers.UserFormInput
 import daos.{User, UserDao}
 import javax.inject.Inject
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class UserResource(id: Long, email: String, name: String)
 
 object UserResource {
-
   implicit val userWrites: Writes[UserResource] = Json.writes[UserResource]
+  implicit val userReads: Reads[UserResource] = Json.reads[UserResource]
 }
 
 class UserService @Inject()(userDao: UserDao)(implicit ec: ExecutionContext) {
@@ -32,6 +32,14 @@ class UserService @Inject()(userDao: UserDao)(implicit ec: ExecutionContext) {
 
   def find(id: Long): Future[Option[UserResource]] = {
     userDao.find(id).map { maybeUser =>
+      maybeUser.map { user =>
+        createUserResource(user)
+      }
+    }
+  }
+
+  def find(email: String): Future[Option[UserResource]] = {
+    userDao.find(email).map { maybeUser =>
       maybeUser.map { user =>
         createUserResource(user)
       }
